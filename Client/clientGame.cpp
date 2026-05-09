@@ -12,6 +12,8 @@ using namespace std;
 
 void client_sendPacket(uint16_t msgId, const void* data, uint32_t size);
 
+vector<tileType> GenerateAsteroidShape(const vec2 size);
+
 unordered_map<string, atlas> atlases;
 
 //Player Stuff
@@ -63,8 +65,20 @@ void client_removePlayer(uint32_t id) {
     snapshotHistory.erase(id);
 }
 
+static vector<tileType> asteroidShape;
+static vec2 asteroidSize;
+static unordered_map<tileType, pair<atlas*, int>> tileLookup;
+
 void client_load(SDL_Renderer* renderer) {
     atlases = atlasLoader::LoadAll(*renderer, "Data");
+    asteroidSize = vec2(200, 200);
+    asteroidShape = GenerateAsteroidShape(asteroidSize);
+    for (auto& [name, a] : atlases) {
+        for (int i = 0; i < a.tiles.size(); ++i) {
+            tileType t = a.tiles[i].type;
+            tileLookup[t] = { &a, i };
+        }
+    }
 }
 
 
@@ -104,39 +118,40 @@ void client_update(float dt) {
 const uint64_t INTERP_DELAY = 100; // ms
 
 void client_render(SDL_Renderer* renderer) {
-    // TEMP RENDER TILE ATLAS
-    int drawX = 20;
-    int drawY = 20;
+    // === RENDER ASTEROID TILEMAP ===
 
-    for (auto& [name, a] : atlases) {
+    for (int y = 0; y < asteroidSize.y; ++y) {
+        for (int x = 0; x < asteroidSize.x; ++x) {
 
-        int offset = 0;
+            tileType t = asteroidShape[x + y * asteroidSize.x];
+            if (t == tileType::UNKNOWN) continue;
 
-        for (const auto& tile : a.tiles) {
+            auto it = tileLookup.find(t);
+            if (it == tileLookup.end()) continue;
+
+            atlas* a = it->second.first;
+            int index = it->second.second;
+
+            const auto& tile = a->tiles[index];
+            int tileSize = a->size;
 
             SDL_FRect src {
-                   (float)tile.x,
-                   (float)tile.y,
-                (float)a.size,
-                (float)a.size
+                (float)tile.x,
+                (float)tile.y,
+                (float)tileSize,
+                (float)tileSize
             };
 
             SDL_FRect dst {
-                (float)(drawX + offset),
-                   (float)drawY,
-                (float)a.size,
-                (float)a.size
+                (float)(x * tileSize),
+                (float)(y * tileSize),
+                (float)tileSize,
+                (float)tileSize
             };
 
-            SDL_RenderTexture(renderer, a.texture, &src, &dst);
-
-            offset += a.size + 4;
+            SDL_RenderTexture(renderer, a->texture, &src, &dst);
         }
-
-        drawY += a.size + 10; // move down for next atlas
     }
-
-    // END TEMPORARY TILE RENDERING
     
     // Render local player directly (predicted)
     if (localPlayerId != sizeof(uint32_t)) {

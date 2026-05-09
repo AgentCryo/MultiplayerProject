@@ -4,9 +4,16 @@
   "asteroid_background_tile_corner_1": { "x": 64, "y": 0,  "type": "BACKGROUND_CORNER" },
   "asteroid_background_tile_corner_2": { "x": 0,  "y": 64, "type": "BACKGROUND_CORNER" },
   "asteroid_background_tile_corner_3": { "x": 64, "y": 64, "type": "BACKGROUND_CORNER" },
+  
+  "asteroid_background_tile_inverse_corner_0": { "x": 96,  "y": 0,  "type": "BACKGROUND_INVERSE_CORNER" },
+  "asteroid_background_tile_inverse_corner_1": { "x": 128, "y": 0,  "type": "BACKGROUND_INVERSE_CORNER" },
+  "asteroid_background_tile_inverse_corner_2": { "x": 96,  "y": 32, "type": "BACKGROUND_INVERSE_CORNER" },
+  "asteroid_background_tile_inverse_corner_3": { "x": 128, "y": 32, "type": "BACKGROUND_INVERSE_CORNER" },
+  
   "asteroid_background_tile_edge_0":   { "x": 32, "y": 0,  "type": "BACKGROUND_EDGE"   },
   "asteroid_background_tile_edge_1":   { "x": 0,  "y": 32, "type": "BACKGROUND_EDGE"   },
   "asteroid_background_tile_edge_2":   { "x": 64, "y": 32, "type": "BACKGROUND_EDGE"   },
   "asteroid_background_tile_edge_3":   { "x": 32, "y": 64, "type": "BACKGROUND_EDGE"   },
+  
   "asteroid_background_tile_center":   { "x": 32, "y": 32, "type": "BACKGROUND_CENTER" }
 }

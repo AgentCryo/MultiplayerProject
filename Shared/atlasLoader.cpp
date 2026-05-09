@@ -14,6 +14,7 @@ using namespace std;
 
 static tileType parseType(const string& t) {
     if (t == "BACKGROUND_CORNER") return tileType::BACKGROUND_CORNER;
+    if (t == "BACKGROUND_INVERSE_CORNER") return tileType::BACKGROUND_INVERSE_CORNER;
     if (t == "BACKGROUND_EDGE")   return tileType::BACKGROUND_EDGE;
     if (t == "BACKGROUND_CENTER") return tileType::BACKGROUND_CENTER;
     if (t == "BACKGROUND_DECOR") return tileType::BACKGROUND_DECOR;
