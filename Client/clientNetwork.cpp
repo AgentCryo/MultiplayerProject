@@ -10,6 +10,7 @@
 
 void client_applyPlayerState(const PlayerStatePacket& ps);
 void client_removePlayer(uint32_t id);
+void client_load(SDL_Renderer* renderer);
 void client_update(float dt);
 void client_render(SDL_Renderer* renderer);
 void client_onData(uint16_t msgId, const uint8_t* data, uint32_t size);
@@ -77,6 +78,7 @@ int runClient(const std::string& ip) {
         enet_peer_send(peer, 0, pkt);
         enet_host_flush(client);
 
+        client_load(renderer);
     } else {
         std::cout << "[CLIENT] Connection failed.\n";
         return 0;

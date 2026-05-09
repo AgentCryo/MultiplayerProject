@@ -1,10 +1,14 @@
 #include <unordered_map>
 #include <functional>
+#include <string>
+
 #include "../Shared/player.h"
 #include "../Shared/Packets/dataPackets.h"
 #include "../Shared/Packets/packets.h"
 
-static std::unordered_map<uint32_t, player> players;
+using namespace std;
+
+static unordered_map<uint32_t, player> players;
 
 // Arb packet handler registry
 using ServerHandler = std::function<void(uint32_t playerId, const uint8_t* data, uint32_t size)>;
@@ -29,7 +33,7 @@ void removePlayer(uint32_t id) {
     players.erase(id);
 }
 
-const std::unordered_map<uint32_t, player>& getPlayers() {
+const unordered_map<uint32_t, player>& getPlayers() {
     return players;
 }
 

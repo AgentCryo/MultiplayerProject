@@ -3,6 +3,7 @@
 #include <vector>
 #include <SDL3/SDL.h>
 
+#include "../Shared/atlas.h"
 #include "../Shared/player.h"
 #include "../Helpers/DataTypes/vec2.h"
 #include "../Shared/Packets/dataPackets.h"
@@ -11,6 +12,9 @@ using namespace std;
 
 void client_sendPacket(uint16_t msgId, const void* data, uint32_t size);
 
+unordered_map<string, atlas> atlases;
+
+//Player Stuff
 static unordered_map<uint32_t, player> client_players;
 
 static uint32_t localPlayerId = sizeof(uint32_t);
@@ -22,6 +26,7 @@ struct Snapshot {
 };
 
 static unordered_map<uint32_t, vector<Snapshot>> snapshotHistory;
+//End Player Stuff
 
 void client_onData(uint16_t msgId, const uint8_t* data, uint32_t size) {
     
@@ -57,6 +62,11 @@ void client_removePlayer(uint32_t id) {
     client_players.erase(id);
     snapshotHistory.erase(id);
 }
+
+void client_load(SDL_Renderer* renderer) {
+    atlases = atlasLoader::LoadAll(*renderer, "Data");
+}
+
 
 void client_update(float dt) {
     const bool* keys = SDL_GetKeyboardState(nullptr);
@@ -94,7 +104,40 @@ void client_update(float dt) {
 const uint64_t INTERP_DELAY = 100; // ms
 
 void client_render(SDL_Renderer* renderer) {
+    // TEMP RENDER TILE ATLAS
+    int drawX = 20;
+    int drawY = 20;
 
+    for (auto& [name, a] : atlases) {
+
+        int offset = 0;
+
+        for (const auto& tile : a.tiles) {
+
+            SDL_FRect src {
+                   (float)tile.x,
+                   (float)tile.y,
+                (float)a.size,
+                (float)a.size
+            };
+
+            SDL_FRect dst {
+                (float)(drawX + offset),
+                   (float)drawY,
+                (float)a.size,
+                (float)a.size
+            };
+
+            SDL_RenderTexture(renderer, a.texture, &src, &dst);
+
+            offset += a.size + 4;
+        }
+
+        drawY += a.size + 10; // move down for next atlas
+    }
+
+    // END TEMPORARY TILE RENDERING
+    
     // Render local player directly (predicted)
     if (localPlayerId != sizeof(uint32_t)) {
         auto it = client_players.find(localPlayerId);
