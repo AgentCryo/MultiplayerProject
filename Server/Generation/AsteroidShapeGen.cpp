@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <bitset>
 #include <vector>
 #include <cstdint>
 #include <iostream>
@@ -77,7 +78,7 @@ static const vector<Rule> rules = {
     // EDGES
     { tileType::BACKGROUND_EDGE,
       0b000111000,
-      0b000111000 },
+      0b010111000 },
 
     { tileType::BACKGROUND_EDGE,
       0b010010010,
@@ -103,7 +104,7 @@ static const vector<Rule> rules = {
       0b000010010,
       0b110110110 },
 
-    // OUTER→INNER TRANSITIONS
+    // OUTER to INNER TRANSITIONS
     { tileType::BACKGROUND_OUTER_TO_INNER_TRANSITION,
       0b010100000,
       0b110100000 },
@@ -143,9 +144,11 @@ vector<asteroidTileInfo> GenerateAsteroidShape(const vec2 size) {
             GetArea(img, area, size, vec2(x, y));
 
             uint16_t mask = (area[0] << 8) | (area[1] << 7) | (area[2] << 6) | (area[3] << 5) | (area[4] << 4) | (area[5] << 3) | (area[6] << 2) | (area[7] << 1) | (area[8] << 0);
+           
+            if (mask == 512) {out[idx] = {0, tileType::BACKGROUND_CENTER};continue;}
+
             uint16_t rotated = mask;
 
-            // Try all 4 rotations
             for (uint8_t rot = 0; rot < 4; rot++) {
                 for (const auto& r : rules) {
                     if ((rotated & r.mask) == r.required) {
@@ -155,9 +158,9 @@ vector<asteroidTileInfo> GenerateAsteroidShape(const vec2 size) {
                 }
                 rotated = rotateMask(rotated);
             }
-            out[idx] = {0, tileType::UNKNOWN};
 
             nextTile:;
+
         }
     }
 
