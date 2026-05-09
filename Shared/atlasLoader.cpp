@@ -93,9 +93,32 @@ unordered_map<string, atlas> atlasLoader::LoadAll(SDL_Renderer& renderer, const 
 
         SDL_Log("[ATLAS] Texture OK: %s", pngPathStr.c_str());
 
-        // Parse tile entries
+        if (j.contains("batches")) {
+            for (auto& batch : j["batches"]) {
+
+                int size = j["size"];
+                int tilesX = batch["tiles_x"];
+                int tilesY = batch["tiles_y"];
+                int startX = batch.value("start_x", 0);
+                int startY = batch.value("start_y", 0);
+                tileType type = parseType(batch["type"]);
+
+                for (int y = 0; y < tilesY; ++y) {
+                    for (int x = 0; x < tilesX; ++x) {
+
+                        tileInfo info;
+                        info.x = startX + x * size;
+                        info.y = startY + y * size;
+                        info.type = type;
+
+                        atlas.tiles.push_back(info);
+                    }
+                }
+            }
+        }
+
         for (auto& [key, value] : j.items()) {
-            if (key == "size") continue;
+            if (key == "size" || key == "batches" || key == "singles") continue;
 
             tileInfo info;
             info.x = value["x"];
@@ -103,6 +126,16 @@ unordered_map<string, atlas> atlasLoader::LoadAll(SDL_Renderer& renderer, const 
             info.type = parseType(value["type"]);
 
             atlas.tiles.push_back(info);
+        }
+
+        if (j.contains("singles")) {
+            for (auto& [key, value] : j["singles"].items()) {
+                tileInfo info;
+                info.x = value["x"];
+                info.y = value["y"];
+                info.type = parseType(value["type"]);
+                atlas.tiles.push_back(info);
+            }
         }
 
         SDL_Log("[ATLAS] Loaded %zu tiles for '%s'", atlas.tiles.size(), baseName.c_str());
